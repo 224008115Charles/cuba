@@ -764,7 +764,7 @@ public class WebTokenList<V extends Entity> extends WebV8AbstractField<WebTokenL
         public CubaTokenList(WebTokenList owner) {
             this.owner = owner;
 
-            setWidthUndefined();
+            super.setWidthUndefined();
 
             composition = new VerticalLayout();
             composition.setWidthUndefined();

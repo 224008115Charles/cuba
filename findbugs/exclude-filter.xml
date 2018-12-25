@@ -5,6 +5,10 @@
     </Match>
 
     <Match>
+        <Class name="~com\.haulmont\.cuba\.core\.sys\.jpql\.antlr\.JPAParser\$.*"/>
+    </Match>
+
+    <Match>
         <Class name="com.haulmont.cuba.core.sys.jpql.antlr2.JPA2Parser"/>
     </Match>
 
@@ -39,4 +43,46 @@
     <Match>
         <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
     </Match>
+
+    <!-- Bad practice detected in EclipseLink generated code -->
+
+    <Match>
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+        <Method name="_persistence_get"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+        <Method name="_persistence_set"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Method name="_persistence_get"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Method name="_persistence_set"/>
+    </Match>
+
+    <!-- We do not use platform specific new line characters -->
+
+    <Match>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
+    </Match>
+
+    <!-- Kryo serializer is not used with collections that receive comparator -->
+
+    <Match>
+        <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
+        <Class name="com.haulmont.cuba.core.sys.serialization.KryoSerialization$CubaFieldSerializer"/>
+    </Match>
+
+    <!-- We do not support Java SecurityManager -->
+
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+    </Match>
+
 </FindBugsFilter>
