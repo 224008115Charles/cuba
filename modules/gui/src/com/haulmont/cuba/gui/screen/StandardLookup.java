@@ -127,7 +127,8 @@ public class StandardLookup<T extends Entity> extends Screen implements LookupSc
     }
 
     @SuppressWarnings("unchecked")
-    protected LookupComponent<T> getLookupComponent() {
+    @Override
+    public LookupComponent<T> getLookupComponent() {
         com.haulmont.cuba.gui.screen.LookupComponent annotation =
                 getClass().getAnnotation(com.haulmont.cuba.gui.screen.LookupComponent.class);
         if (annotation == null || Strings.isNullOrEmpty(annotation.value())) {

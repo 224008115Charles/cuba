@@ -17,6 +17,7 @@
 package com.haulmont.cuba.gui.screen;
 
 import com.haulmont.cuba.core.entity.Entity;
+import com.haulmont.cuba.gui.components.Component;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -56,6 +57,11 @@ public interface LookupScreen<E extends Entity> {
      * @param selectValidator selection validator
      */
     void setSelectValidator(Predicate<ValidationContext<E>> selectValidator);
+
+    /**
+     * @return lookup component
+     */
+    Component getLookupComponent();
 
     /**
      * Validation data context.
