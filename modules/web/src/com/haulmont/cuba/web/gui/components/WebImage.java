@@ -80,14 +80,13 @@ public class WebImage extends WebAbstractResourceView<CubaImage> implements Imag
             return;
         }
 
+        unbindValueSourceEvents();
+
         if (this.valueSource != null && valueSource == null) {
-            unBindValueSourceEvents();
             component.setSource(null);
             this.valueSource = null;
             return;
         }
-
-        unBindValueSourceEvents();
 
         this.valueSource = valueSource;
 
@@ -95,7 +94,7 @@ public class WebImage extends WebAbstractResourceView<CubaImage> implements Imag
         updateComponent();
     }
 
-    protected void unBindValueSourceEvents() {
+    protected void unbindValueSourceEvents() {
         if (valueChangeSubscription != null) {
             valueChangeSubscription.remove();
         }

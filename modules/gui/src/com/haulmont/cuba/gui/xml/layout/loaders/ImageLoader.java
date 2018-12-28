@@ -16,15 +16,9 @@
 
 package com.haulmont.cuba.gui.xml.layout.loaders;
 
-import com.google.common.base.Strings;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
 import com.haulmont.cuba.gui.components.Image;
-import com.haulmont.cuba.gui.components.data.value.ContainerValueSource;
 import com.haulmont.cuba.gui.data.Datasource;
-import com.haulmont.cuba.gui.model.InstanceContainer;
-import com.haulmont.cuba.gui.model.ScreenData;
-import com.haulmont.cuba.gui.screen.FrameOwner;
-import com.haulmont.cuba.gui.screen.UiControllerUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 
@@ -40,7 +34,7 @@ public class ImageLoader extends AbstractResourceViewLoader<Image> {
     public void loadComponent() {
         super.loadComponent();
 
-        loadDataContainer(resultComponent, element);
+        loadContainer(resultComponent, element);
         if (resultComponent.getValueSource() == null) {
             loadDatasource(resultComponent, element);
         }
@@ -74,25 +68,6 @@ public class ImageLoader extends AbstractResourceViewLoader<Image> {
             }
 
             component.setDatasource(ds, property);
-        }
-    }
-
-    protected void loadDataContainer(Image component, Element element) {
-        String containerId = element.attributeValue("dataContainer");
-        String property = element.attributeValue("property");
-
-        if (!Strings.isNullOrEmpty(containerId)) {
-            if (property == null) {
-                throw new GuiDevelopmentException(
-                        String.format("Can't set container '%s' for component '%s' because 'property' " +
-                                "attribute is not defined", containerId, component.getId()), context.getFullFrameId());
-            }
-
-            FrameOwner frameOwner = context.getFrame().getFrameOwner();
-            ScreenData screenData = UiControllerUtils.getScreenData(frameOwner);
-            InstanceContainer container = screenData.getContainer(containerId);
-            //noinspection unchecked
-            resultComponent.setValueSource(new ContainerValueSource<>(container, property));
         }
     }
 }
