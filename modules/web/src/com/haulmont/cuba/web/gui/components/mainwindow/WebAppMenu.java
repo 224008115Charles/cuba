@@ -108,8 +108,11 @@ public class WebAppMenu extends WebAbstractComponent<CubaMenuBar> implements App
 
         MenuBar.MenuItem delegateItem = component.createMenuItem(caption, iconResource, null);
         if (command != null) {
+            @SuppressWarnings("UnnecessaryLocalVariable")
+            Consumer<MenuItem> nonnullCommand = command;
+
             delegateItem.setCommand(selectedItem ->
-                    command.accept(menuItem));
+                    nonnullCommand.accept(menuItem));
         }
         menuItem.setDelegateItem(delegateItem);
 

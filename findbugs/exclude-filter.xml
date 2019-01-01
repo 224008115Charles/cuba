@@ -1,5 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FindBugsFilter>
+    <!-- Disabled bug patterns -->
+
+    <Match>
+        <Bug pattern="IA_AMBIGUOUS_INVOCATION_OF_INHERITED_OR_OUTER_METHOD"/>
+    </Match>
+    <Match>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+    </Match>
+    <Match>
+        <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
+    </Match>
+    <Match>
+        <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
+    </Match>
+    <Match>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/> <!-- We do not use platform specific new line characters -->
+    </Match>
+    <Match>
+        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/> <!-- We do not support Java SecurityManager -->
+    </Match>
+
+    <!-- Ignored problems in classes -->
+
+    <!-- Bad practice detected in EclipseLink generated code -->
+
+    <Match>
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+        <Method name="_persistence_get"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+        <Method name="_persistence_set"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Method name="_persistence_get"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Method name="_persistence_set"/>
+    </Match>
+
+    <!-- Others -->
+
     <Match>
         <Class name="com.haulmont.cuba.core.sys.jpql.antlr.JPAParser"/>
     </Match>
@@ -32,57 +79,37 @@
         <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS" />
     </Match>
 
-    <Match>
-        <Bug pattern="IA_AMBIGUOUS_INVOCATION_OF_INHERITED_OR_OUTER_METHOD"/>
-    </Match>
+    <!-- Event field actually is serializable -->
 
     <Match>
-        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <Bug pattern="SE_BAD_FIELD"/>
+        <Class name="com.haulmont.restapi.events.OAuthTokenRevokedResponseEvent"/>
     </Match>
 
-    <Match>
-        <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"/>
-    </Match>
-
-    <!-- Bad practice detected in EclipseLink generated code -->
-
-    <Match>
-        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
-        <Method name="_persistence_get"/>
-    </Match>
-
-    <Match>
-        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
-        <Method name="_persistence_set"/>
-    </Match>
-
-    <Match>
-        <Bug pattern="EI_EXPOSE_REP"/>
-        <Method name="_persistence_get"/>
-    </Match>
+    <!-- LocalService invocation classes may contain mutable data -->
 
     <Match>
         <Bug pattern="EI_EXPOSE_REP2"/>
-        <Method name="_persistence_set"/>
+        <Class name="com.haulmont.cuba.core.sys.remoting.LocalServiceInvocation"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class name="com.haulmont.cuba.core.sys.remoting.LocalServiceInvocation"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Class name="com.haulmont.cuba.core.sys.remoting.LocalServiceInvocationResult"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class name="com.haulmont.cuba.core.sys.remoting.LocalServiceInvocationResult"/>
     </Match>
 
-    <!-- We do not use platform specific new line characters -->
+    <!-- CubaFoldersPane is Vaadin component, ignore serialization warnings -->
 
     <Match>
-        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
-    </Match>
-
-    <!-- Kryo serializer is not used with collections that receive comparator -->
-
-    <Match>
-        <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
-        <Class name="com.haulmont.cuba.core.sys.serialization.KryoSerialization$CubaFieldSerializer"/>
-    </Match>
-
-    <!-- We do not support Java SecurityManager -->
-
-    <Match>
-        <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+        <Bug pattern="SE_BAD_FIELD"/>
+        <Class name="com.haulmont.cuba.web.app.folders.CubaFoldersPane"/>
     </Match>
 
 </FindBugsFilter>

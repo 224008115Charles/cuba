@@ -28,7 +28,6 @@ public class ParamEditor implements AbstractCondition.Listener {
 
     protected AbstractCondition condition;
     protected boolean removeButtonVisible;
-    protected Component field;
     protected String fieldWidth = null;
     protected Label captionLbl;
     protected Component operationEditor;

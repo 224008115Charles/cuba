@@ -48,7 +48,7 @@ public class ExcelAutoColumnSizer {
 
     private FontMetrics getFontMetrics(HSSFFont hf){
         FontMetrics fm;
-        Short pFont = new Short(hf.getIndex());
+        Short pFont = hf.getIndex();
 
         fm = (FontMetrics) fontMetrics.get(pFont);
         if (fm == null) {
