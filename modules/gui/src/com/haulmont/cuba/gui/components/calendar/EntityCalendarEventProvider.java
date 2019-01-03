@@ -45,6 +45,7 @@ public class EntityCalendarEventProvider implements CalendarEventProvider,
     protected CollectionDatasource.CollectionChangeListener collectionChangeListener;
     protected Datasource.ItemPropertyChangeListener itemPropertyChangeListener;
 
+    @SuppressWarnings("unchecked")
     public EntityCalendarEventProvider (CollectionDatasource datasource) {
         this.datasource = datasource;
 
@@ -184,6 +185,7 @@ public class EntityCalendarEventProvider implements CalendarEventProvider,
         return allDayProperty;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void unbind() {
         datasource.removeCollectionChangeListener(collectionChangeListener);

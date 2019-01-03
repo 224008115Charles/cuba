@@ -58,8 +58,6 @@ public class CubaTokenList<T> extends CustomField<T> {
     public CubaTokenList(WebTokenList owner) {
         this.owner = owner;
 
-        super.setWidthUndefined();
-
         composition = new VerticalLayout();
         composition.setWidthUndefined();
         composition.setSpacing(false);
@@ -72,6 +70,9 @@ public class CubaTokenList<T> extends CustomField<T> {
 
         composition.addComponent(tokenContainer);
         setPrimaryStyleName(TOKENLIST_STYLENAME);
+
+        // do not trigger overridden method
+        super.setWidth(-1, Unit.PIXELS);
     }
 
     @Override

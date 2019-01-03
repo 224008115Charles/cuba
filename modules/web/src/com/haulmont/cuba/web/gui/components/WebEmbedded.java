@@ -217,8 +217,7 @@ public class WebEmbedded extends WebAbstractComponent<com.vaadin.ui.Embedded> im
         @Override
         public InputStream getStream() {
             if (emptyImage == null) {
-                InputStream stream =
-                        getClass().getResourceAsStream(EMPTY_IMAGE_PATH);
+                InputStream stream = WebEmbedded.class.getResourceAsStream(EMPTY_IMAGE_PATH);
                 try {
                     emptyImage = IOUtils.toByteArray(stream);
                 } catch (IOException e) {
