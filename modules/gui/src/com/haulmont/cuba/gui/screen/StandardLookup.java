@@ -78,17 +78,13 @@ public class StandardLookup<T extends Entity> extends Screen implements LookupSc
         Component lookupComponent = getLookupComponent();
         if (lookupComponent instanceof LookupSelectionChangeNotifier) {
             LookupSelectionChangeNotifier selectionNotifier = (LookupSelectionChangeNotifier) lookupComponent;
-            //noinspection unchecked
-            selectionNotifier.addLookupValueChangeListener(valueChangeEvent ->
-                    handleLookupComponentValueChange(selectionNotifier, commitAction));
+            if (commitAction != null) {
+                //noinspection unchecked
+                selectionNotifier.addLookupValueChangeListener(valueChangeEvent ->
+                        commitAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty()));
 
-            handleLookupComponentValueChange(selectionNotifier, commitAction);
-        }
-    }
-
-    protected void handleLookupComponentValueChange(LookupSelectionChangeNotifier selectionNotifier, Action selectAction) {
-        if (selectAction != null) {
-            selectAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty());
+                commitAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty());
+            }
         }
     }
 

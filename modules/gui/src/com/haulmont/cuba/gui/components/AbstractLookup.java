@@ -123,17 +123,13 @@ public class AbstractLookup extends AbstractWindow implements Lookup {
         Component lookupComponent = getLookupComponent();
         if (lookupComponent instanceof LookupSelectionChangeNotifier) {
             LookupSelectionChangeNotifier selectionNotifier = (LookupSelectionChangeNotifier) lookupComponent;
-            //noinspection unchecked
-            selectionNotifier.addLookupValueChangeListener(event ->
-                    handleLookupComponentValueChange(selectionNotifier, selectAction));
+            if (selectAction != null) {
+                //noinspection unchecked
+                selectionNotifier.addLookupValueChangeListener(valueChangeEvent ->
+                        selectAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty()));
 
-            handleLookupComponentValueChange(selectionNotifier, selectAction);
-        }
-    }
-
-    protected void handleLookupComponentValueChange(LookupSelectionChangeNotifier selectionNotifier, Action selectAction) {
-        if (selectAction != null) {
-            selectAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty());
+                selectAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty());
+            }
         }
     }
 
