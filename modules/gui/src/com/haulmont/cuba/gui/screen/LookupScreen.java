@@ -59,11 +59,6 @@ public interface LookupScreen<E extends Entity> {
     void setSelectValidator(Predicate<ValidationContext<E>> selectValidator);
 
     /**
-     * @return lookup component
-     */
-    Component getLookupComponent();
-
-    /**
      * Validation data context.
      *
      * @param <T> type of entity

@@ -18,6 +18,7 @@ package com.haulmont.cuba.gui.components;
 
 import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.Fragments;
+import com.haulmont.cuba.gui.components.LookupComponent.LookupSelectionChangeNotifier;
 import com.haulmont.cuba.gui.components.Window.Lookup;
 import com.haulmont.cuba.gui.components.actions.BaseAction;
 import com.haulmont.cuba.gui.screen.ScreenFragment;
@@ -117,6 +118,22 @@ public class AbstractLookup extends AbstractWindow implements Lookup {
                 Component component = getFrame().getComponent(lookupComponent);
                 setLookupComponent(component);
             }
+        }
+
+        Component lookupComponent = getLookupComponent();
+        if (lookupComponent instanceof LookupSelectionChangeNotifier) {
+            LookupSelectionChangeNotifier selectionNotifier = (LookupSelectionChangeNotifier) lookupComponent;
+            //noinspection unchecked
+            selectionNotifier.addLookupValueChangeListener(event ->
+                    handleLookupComponentValueChange(selectionNotifier, selectAction));
+
+            handleLookupComponentValueChange(selectionNotifier, selectAction);
+        }
+    }
+
+    protected void handleLookupComponentValueChange(LookupSelectionChangeNotifier selectionNotifier, Action selectAction) {
+        if (selectAction != null) {
+            selectAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty());
         }
     }
 

@@ -20,8 +20,10 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.ExtendedEntities;
 import com.haulmont.cuba.gui.Screens;
-import com.haulmont.cuba.gui.components.*;
-import com.haulmont.cuba.gui.components.LookupComponent.LookupSelectionChangeNotifier;
+import com.haulmont.cuba.gui.components.LookupPickerField;
+import com.haulmont.cuba.gui.components.SupportsUserAction;
+import com.haulmont.cuba.gui.components.HasValue;
+import com.haulmont.cuba.gui.components.ListComponent;
 import com.haulmont.cuba.gui.components.data.Options;
 import com.haulmont.cuba.gui.components.data.meta.ContainerDataUnit;
 import com.haulmont.cuba.gui.components.data.meta.EntityOptions;
@@ -30,7 +32,11 @@ import com.haulmont.cuba.gui.model.CollectionContainer;
 import com.haulmont.cuba.gui.model.DataContext;
 import com.haulmont.cuba.gui.model.InstanceContainer;
 import com.haulmont.cuba.gui.model.Nested;
-import com.haulmont.cuba.gui.screen.*;
+import com.haulmont.cuba.gui.screen.FrameOwner;
+import com.haulmont.cuba.gui.screen.LookupScreen;
+import com.haulmont.cuba.gui.screen.Screen;
+import com.haulmont.cuba.gui.screen.UiControllerUtils;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -38,10 +44,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static com.haulmont.cuba.gui.screen.LookupScreen.LOOKUP_SELECT_ACTION_ID;
 import static com.haulmont.cuba.gui.screen.UiControllerUtils.getScreenContext;
 
-@org.springframework.stereotype.Component("cuba_LookupBuilderProcessor")
+@Component("cuba_LookupBuilderProcessor")
 public class LookupBuilderProcessor {
 
     @Inject
@@ -122,18 +127,6 @@ public class LookupBuilderProcessor {
             }
         }
 
-        Component lookupComponent = lookupScreen.getLookupComponent();
-        if (lookupComponent instanceof LookupSelectionChangeNotifier) {
-
-            Action selectAction = screen.getWindow().getAction(LOOKUP_SELECT_ACTION_ID);
-
-            LookupSelectionChangeNotifier selectionNotifier = (LookupSelectionChangeNotifier) lookupComponent;
-            selectionNotifier.addLookupValueChangeListener(event ->
-                    handleLookupComponentValueChange(selectionNotifier, selectAction));
-
-            handleLookupComponentValueChange(selectionNotifier, selectAction);
-        }
-
         return screen;
     }
 
@@ -164,12 +157,6 @@ public class LookupBuilderProcessor {
             screen = screens.create(lookupScreenId, builder.getLaunchMode(), builder.getOptions());
         }
         return screen;
-    }
-
-    protected void handleLookupComponentValueChange(LookupSelectionChangeNotifier selectionNotifier, Action selectAction) {
-        if (selectAction != null) {
-            selectAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty());
-        }
     }
 
     @SuppressWarnings("unchecked")

@@ -24,6 +24,7 @@ import com.haulmont.cuba.core.global.Messages;
 import com.haulmont.cuba.gui.components.Action;
 import com.haulmont.cuba.gui.components.Component;
 import com.haulmont.cuba.gui.components.LookupComponent;
+import com.haulmont.cuba.gui.components.LookupComponent.LookupSelectionChangeNotifier;
 import com.haulmont.cuba.gui.components.Window;
 import com.haulmont.cuba.gui.components.actions.BaseAction;
 import com.haulmont.cuba.gui.icons.CubaIcon;
@@ -73,6 +74,22 @@ public class StandardLookup<T extends Entity> extends Screen implements LookupSc
                 .withHandler(this::cancel);
 
         window.addAction(closeAction);
+
+        Component lookupComponent = getLookupComponent();
+        if (lookupComponent instanceof LookupSelectionChangeNotifier) {
+            LookupSelectionChangeNotifier selectionNotifier = (LookupSelectionChangeNotifier) lookupComponent;
+            //noinspection unchecked
+            selectionNotifier.addLookupValueChangeListener(valueChangeEvent ->
+                    handleLookupComponentValueChange(selectionNotifier, commitAction));
+
+            handleLookupComponentValueChange(selectionNotifier, commitAction);
+        }
+    }
+
+    protected void handleLookupComponentValueChange(LookupSelectionChangeNotifier selectionNotifier, Action selectAction) {
+        if (selectAction != null) {
+            selectAction.setEnabled(!selectionNotifier.getLookupSelectedItems().isEmpty());
+        }
     }
 
     private void beforeShow(@SuppressWarnings("unused") BeforeShowEvent beforeShowEvent) {
@@ -127,8 +144,7 @@ public class StandardLookup<T extends Entity> extends Screen implements LookupSc
     }
 
     @SuppressWarnings("unchecked")
-    @Override
-    public LookupComponent<T> getLookupComponent() {
+    protected LookupComponent<T> getLookupComponent() {
         com.haulmont.cuba.gui.screen.LookupComponent annotation =
                 getClass().getAnnotation(com.haulmont.cuba.gui.screen.LookupComponent.class);
         if (annotation == null || Strings.isNullOrEmpty(annotation.value())) {
