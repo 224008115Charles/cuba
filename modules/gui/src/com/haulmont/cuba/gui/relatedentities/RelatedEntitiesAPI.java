@@ -20,6 +20,9 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.WindowManager;
+import com.haulmont.cuba.gui.screen.FrameOwner;
+import com.haulmont.cuba.gui.screen.OpenMode;
+import com.haulmont.cuba.gui.screen.Screen;
 
 import java.util.Collection;
 import java.util.Map;
@@ -43,7 +46,7 @@ public interface RelatedEntitiesAPI {
      * @param selectedEntities set of entities which represents one side of relation
      * @param metaClass        metaClass of single entity from <code>selectedEntities</code>
      * @param metaProperty     chosen field to find related entities. Can be obtained from <code>metaClass</code>
-     * @param descriptor       descriptor contains screen id, {@link WindowManager.OpenType} and
+     * @param descriptor       descriptor contains screen id or screen class, {@link OpenMode}, frame owner and
      *                         generated filter caption
      */
     void openRelatedScreen(Collection<? extends Entity> selectedEntities, MetaClass metaClass, MetaProperty metaProperty,
@@ -64,7 +67,7 @@ public interface RelatedEntitiesAPI {
      * @param selectedEntities set of entities which represents one side of relation
      * @param clazz            class of single entity from <code>selectedEntities</code>
      * @param property         chosen field to find related entities
-     * @param descriptor       descriptor contains screen id, {@link WindowManager.OpenType} and
+     * @param descriptor       descriptor contains screen id or screen class, {@link OpenMode}, frame owner and
      *                         generated filter caption
      */
     <T extends Entity> void openRelatedScreen(Collection<T> selectedEntities, Class<T> clazz, String property,
@@ -77,13 +80,68 @@ public interface RelatedEntitiesAPI {
         protected String filterCaption;
         protected Map<String, Object> screenParams;
 
+        protected Class screenClass;
+        protected OpenMode openMode = OpenMode.THIS_TAB;
+        protected FrameOwner origin;
+
+        /**
+         * @param screenId screen id
+         * @param openType open type
+         * @deprecated Use {@link #RelatedScreenDescriptor(String, OpenMode, FrameOwner)} instead.
+         */
+        @Deprecated
         public RelatedScreenDescriptor(String screenId, WindowManager.OpenType openType) {
-            this.screenId = screenId;
+            this(screenId, openType.getOpenMode(), null);
             this.openType = openType;
         }
 
+        /**
+         * @param screenId screen id
+         * @deprecated Use {@link #RelatedScreenDescriptor(String, FrameOwner)} instead.
+         */
+        @Deprecated
         public RelatedScreenDescriptor(String screenId) {
-            this(screenId, WindowManager.OpenType.THIS_TAB);
+            this(screenId, (FrameOwner) null);
+        }
+
+        /**
+         * @param screenId screen id
+         * @param frameOwner screen owner from which you open related screen
+         */
+        public RelatedScreenDescriptor(String screenId, FrameOwner frameOwner) {
+            this(screenId, OpenMode.THIS_TAB, frameOwner);
+        }
+
+        /**
+         * @param screenId id of opening screen
+         * @param openMode open mode
+         * @param origin screen owner from which you open related screen
+         */
+        public RelatedScreenDescriptor(String screenId, OpenMode openMode, FrameOwner origin) {
+            this.screenId = screenId;
+            this.openMode = openMode;
+            this.origin = origin;
+        }
+
+        /**
+         * @param screenClass controller class
+         * @param openMode open model
+         * @param origin screen owner from which you open related screen
+         * @param <S> class of controller that extends Screen
+         */
+        public <S extends Screen> RelatedScreenDescriptor(Class<S> screenClass, OpenMode openMode, FrameOwner origin) {
+            this.screenClass = screenClass;
+            this.openMode = openMode;
+            this.origin = origin;
+        }
+
+        /**
+         * @param screenClass controller class
+         * @param origin screen owner from which you open related screen
+         * @param <S> class of controller that extends Screen
+         */
+        public <S extends Screen> RelatedScreenDescriptor(Class<S> screenClass, FrameOwner origin) {
+            this(screenClass, OpenMode.THIS_TAB, origin);
         }
 
         public RelatedScreenDescriptor() {
@@ -93,6 +151,11 @@ public interface RelatedEntitiesAPI {
             return screenId;
         }
 
+        /**
+         * @return open type of screen
+         * @deprecated Use {@link #getOpenMode()} instead.
+         */
+        @Deprecated
         public WindowManager.OpenType getOpenType() {
             return openType;
         }
@@ -109,8 +172,68 @@ public interface RelatedEntitiesAPI {
             this.screenId = screenId;
         }
 
+        /**
+         * Sets open type to screen.
+         *
+         * @param openType open type
+         * @deprecated Use {@link #setOpenMode(OpenMode)} instead.
+         */
+        @Deprecated
         public void setOpenType(WindowManager.OpenType openType) {
+            setOpenMode(openType.getOpenMode());
+
             this.openType = openType;
+        }
+
+        /**
+         * @return open mode of screen
+         */
+        public OpenMode getOpenMode() {
+            return openMode;
+        }
+
+        /**
+         * Sets open mode to screen.
+         *
+         * @param openMode open  mode
+         */
+        public void setOpenMode(OpenMode openMode) {
+            this.openMode = openMode;
+        }
+
+        /**
+         * @param <S> class of controller that extends Screen
+         * @return screen class
+         */
+        public <S extends Screen> Class<S> getScreenClass() {
+            //noinspection unchecked
+            return screenClass;
+        }
+
+        /**
+         * Sets screen class.
+         *
+         * @param screenClass screen class
+         * @param <S>         class of controller that extends Screen
+         */
+        public <S extends Screen> void setScreenClass(Class<S> screenClass) {
+            this.screenClass = screenClass;
+        }
+
+        /**
+         * @return screen owner from which you open related screen
+         */
+        public FrameOwner getOrigin() {
+            return origin;
+        }
+
+        /**
+         * Sets screen owner from which you open related screen
+         *
+         * @param origin origin
+         */
+        public void setOrigin(FrameOwner origin) {
+            this.origin = origin;
         }
 
         public void setFilterCaption(String filterCaption) {

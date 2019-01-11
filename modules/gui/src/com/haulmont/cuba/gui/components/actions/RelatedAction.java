@@ -22,11 +22,11 @@ import com.haulmont.chile.core.model.MetaProperty;
 import com.haulmont.cuba.core.global.AppBeans;
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.gui.WindowManager.OpenType;
-import com.haulmont.cuba.gui.components.Action;
-import com.haulmont.cuba.gui.components.Component;
-import com.haulmont.cuba.gui.components.ListComponent;
-import com.haulmont.cuba.gui.components.RelatedEntities;
+import com.haulmont.cuba.gui.components.*;
 import com.haulmont.cuba.gui.relatedentities.RelatedEntitiesAPI;
+import com.haulmont.cuba.gui.relatedentities.RelatedEntitiesAPI.RelatedScreenDescriptor;
+import com.haulmont.cuba.gui.screen.FrameOwner;
+import com.haulmont.cuba.gui.screen.OpenMode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
 
@@ -53,7 +53,7 @@ public class RelatedAction extends ListAction implements Action.HasBeforeActionP
     protected String screen;
     protected String filterCaption;
 
-    protected OpenType openType = OpenType.THIS_TAB;
+    protected OpenMode openMode = OpenMode.THIS_TAB;
 
     @Inject
     protected RelatedEntitiesAPI relatedEntitiesApi;
@@ -91,8 +91,24 @@ public class RelatedAction extends ListAction implements Action.HasBeforeActionP
         this.filterCaption = filterCaption;
     }
 
+    /**
+     * Sets open type for screen.
+     *
+     * @param openType open type
+     * @deprecated Use {@link #setOpenMode(OpenMode)} instead.
+     */
+    @Deprecated
     public void setOpenType(OpenType openType) {
-        this.openType = openType;
+        setOpenMode(openType.getOpenMode());
+    }
+
+    /**
+     * Sets open mode for screen.
+     *
+     * @param openMode open mode
+     */
+    public void setOpenMode(OpenMode openMode) {
+        this.openMode = openMode;
     }
 
     @Override
@@ -102,7 +118,15 @@ public class RelatedAction extends ListAction implements Action.HasBeforeActionP
                 return;
         }
 
-        RelatedEntitiesAPI.RelatedScreenDescriptor descriptor = new RelatedEntitiesAPI.RelatedScreenDescriptor(screen, openType);
+        FrameOwner frameOwner = null;
+        if (component instanceof Component.BelongToFrame) {
+            Frame frame = ((Component.BelongToFrame) component).getFrame();
+            if (frame != null) {
+                frameOwner = frame.getFrameOwner();
+            }
+        }
+
+        RelatedScreenDescriptor descriptor = new RelatedScreenDescriptor(screen, openMode, frameOwner);
         descriptor.setFilterCaption(filterCaption);
 
         //noinspection unchecked

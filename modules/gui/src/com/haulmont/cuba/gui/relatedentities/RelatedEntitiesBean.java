@@ -26,6 +26,7 @@ import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.*;
 import com.haulmont.cuba.core.global.filter.Op;
 import com.haulmont.cuba.gui.*;
+import com.haulmont.cuba.gui.builders.ScreenBuilder;
 import com.haulmont.cuba.gui.components.Filter;
 import com.haulmont.cuba.gui.components.FilterImplementation;
 import com.haulmont.cuba.gui.components.Frame;
@@ -39,10 +40,8 @@ import com.haulmont.cuba.gui.components.filter.condition.PropertyCondition;
 import com.haulmont.cuba.gui.components.filter.descriptor.PropertyConditionDescriptor;
 import com.haulmont.cuba.gui.components.sys.ValuePathHelper;
 import com.haulmont.cuba.gui.config.WindowConfig;
-import com.haulmont.cuba.gui.config.WindowInfo;
 import com.haulmont.cuba.gui.data.impl.DsContextImplementation;
-import com.haulmont.cuba.gui.screen.MapScreenOptions;
-import com.haulmont.cuba.gui.screen.Screen;
+import com.haulmont.cuba.gui.screen.*;
 import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.cuba.security.entity.FilterEntity;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -92,6 +91,13 @@ public class RelatedEntitiesBean implements RelatedEntitiesAPI {
     @Inject
     protected ConditionParamBuilder paramBuilder;
 
+    protected ScreenBuilders screenBuilders;
+
+    @Inject
+    public void setScreenBuilders(ScreenBuilders screenBuilders) {
+        this.screenBuilders = screenBuilders;
+    }
+
     @Override
     public void openRelatedScreen(Collection<? extends Entity> selectedEntities, MetaClass metaClass, MetaProperty metaProperty) {
         openRelatedScreen(selectedEntities, metaClass, metaProperty, new RelatedScreenDescriptor());
@@ -121,21 +127,43 @@ public class RelatedEntitiesBean implements RelatedEntitiesAPI {
                 screenId = windowConfig.getBrowseScreenId(metaProperty.getRange().asClass());
             }
 
-            if (StringUtils.isEmpty(screenId)) {
-                String message = String.format("Can't show related entities: passed screenId is null and " +
+            Class screenClass = null;
+            if (descriptor != null && descriptor.getScreenClass() != null) {
+                screenClass = descriptor.getScreenClass();
+            }
+
+            if (StringUtils.isEmpty(screenId) && screenClass == null) {
+                String message = String.format("Can't show related entities: passed screenId or screenClass are null and " +
                         "there is no default browse screen for %s", metaClass.getName());
                 throw new IllegalStateException(message);
             }
 
-
-            WindowManager.OpenType openType = WindowManager.OpenType.THIS_TAB;
+            OpenMode openMode = OpenMode.THIS_TAB;
             if (descriptor != null) {
-                openType = descriptor.getOpenType();
+                openMode = descriptor.getOpenMode();
             }
 
-            Screen screen = windowManager.create(screenId,
-                    openType.getOpenMode(),
-                    new MapScreenOptions(params));
+            FrameOwner origin = null;
+            if (descriptor != null) {
+                origin = descriptor.getOrigin();
+            }
+
+            Screen screen;
+            if (origin != null) {
+                ScreenBuilder screenBuilder = screenBuilders.screen(origin)
+                        .withOpenMode(openMode)
+                        .withScreenId(screenId)
+                        .withOptions(new MapScreenOptions(params));
+
+                //noinspection unchecked
+                screen = screenClass != null ?
+                        screenBuilder.withScreenClass(screenClass).build() : screenBuilder.build();
+            } else if (screenClass != null){
+                //noinspection unchecked
+                screen = windowManager.create(screenClass, openMode, new MapScreenOptions(params));
+            } else {
+                screen = windowManager.create(screenId, openMode, new MapScreenOptions(params));
+            }
 
             boolean found = ComponentsHelper.walkComponents(screen.getWindow(), screenComponent -> {
                 if (!(screenComponent instanceof Filter)) {
@@ -157,8 +185,9 @@ public class RelatedEntitiesBean implements RelatedEntitiesAPI {
             screen.show();
 
             if (!found) {
-                windowManager.showNotification(messages.getMainMessage("actions.Related.FilterNotFound"),
-                        Frame.NotificationType.WARNING);
+                getNotifications(screen).create(Notifications.NotificationType.WARNING)
+                        .withCaption(messages.getMainMessage("actions.Related.FilterNotFound"))
+                        .show();
             }
             if (screen instanceof LegacyFrame) {
                 LegacyFrame legacyFrame = (LegacyFrame) screen;
@@ -187,6 +216,11 @@ public class RelatedEntitiesBean implements RelatedEntitiesAPI {
         MetaProperty metaProperty = metaClass.getPropertyNN(property);
 
         openRelatedScreen(selectedEntities, metaClass, metaProperty, descriptor);
+    }
+
+    protected Notifications getNotifications(FrameOwner frameOwner) {
+        ScreenContext screenContext = UiControllerUtils.getScreenContext(frameOwner);
+        return screenContext.getNotifications();
     }
 
     protected void applyFilter(Filter component, Collection<? extends Entity> selectedParents, RelatedScreenDescriptor descriptor, MetaDataDescriptor metaDataDescriptor) {
