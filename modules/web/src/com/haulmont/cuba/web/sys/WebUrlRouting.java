@@ -31,6 +31,7 @@ import com.haulmont.cuba.web.WebConfig;
 import com.haulmont.cuba.web.gui.UrlHandlingMode;
 import com.haulmont.cuba.web.gui.WebWindow;
 import com.haulmont.cuba.gui.navigation.NavigationState;
+import com.haulmont.cuba.web.sys.navigation.UrlIdSerializer;
 import com.haulmont.cuba.web.sys.navigation.UrlTools;
 import com.vaadin.server.Page;
 import org.apache.commons.collections4.MapUtils;
@@ -233,7 +234,7 @@ public class WebUrlRouting implements UrlRouting {
 
         if (isEditor(screen)) {
             Object entityId = ((EditorScreen) screen).getEditedEntity().getId();
-            String base64Id = UrlTools.serializeId(entityId);
+            String base64Id = UrlIdSerializer.serializeId(entityId);
             if (base64Id != null && !"".equals(base64Id)) {
                 params.put("id", base64Id);
             }

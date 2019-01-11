@@ -420,7 +420,7 @@ public class UrlChangeHandler {
         }
 
         Class<?> idType = metaClass.getPropertyNN("id").getJavaType();
-        Object id = UrlTools.deserializeId(idType, idParam);
+        Object id = UrlIdSerializer.deserializeId(idType, idParam);
 
         LoadContext<?> ctx = new LoadContext(metaClass);
         ctx.setId(id);
