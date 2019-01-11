@@ -102,6 +102,7 @@ public class WebUrlRouting implements UrlRouting {
         NavigationState newState = buildNavState(screen, urlParams);
 
         if (complexRouteNavigation(currentState, newState)) {
+            // do not change URL until last sub route is handled
             return;
         }
 
@@ -116,6 +117,8 @@ public class WebUrlRouting implements UrlRouting {
 
         if (pushState) {
             ui.getHistory().forward(newState);
+        } else {
+            ui.getHistory().replace(newState);
         }
     }
 
@@ -295,14 +298,19 @@ public class WebUrlRouting implements UrlRouting {
     }
 
     protected boolean complexRouteNavigation(NavigationState currentState, NavigationState newState) {
-        if (currentState == null
-                || newState == null
-                || currentState.getNestedRoute() == null
-                || !currentState.getNestedRoute().contains("/")) {
-            return false;
-        }
+        boolean complexRouteRequested = currentState != null
+                && currentState.getNestedRoute() != null
+                && currentState.getNestedRoute().contains("/");
 
-        return !currentState.getNestedRoute().endsWith(newState.getNestedRoute());
+        boolean notInHistory = currentState != null
+                && StringUtils.isEmpty(currentState.getStateMark())
+                || !ui.getHistory().has(currentState);
+
+        boolean lastSubRoute = currentState != null
+                && newState != null
+                && currentState.getNestedRoute().endsWith(newState.getNestedRoute());
+
+        return complexRouteRequested && notInHistory && !lastSubRoute;
     }
 
     protected boolean externalNavigation(NavigationState currentState, NavigationState newState) {

@@ -84,7 +84,7 @@ public class UrlTools {
         }
 
         if (navigationState == null) {
-            log.info("Unable to determine navigation state for the given fragment: \"{}\"", uriFragment);
+            log.debug("Unable to determine navigation state for the given fragment: \"{}\"", uriFragment);
             return NavigationState.EMPTY;
         }
 
